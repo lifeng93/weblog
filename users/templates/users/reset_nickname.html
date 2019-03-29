@@ -1,0 +1,29 @@
+{% extends "users/base_form.html" %}
+
+{% block header %}
+<title>重置昵称</title>
+{% endblock header %}
+
+{% block content %}
+<form method="POST" action="{% url 'users:reset_nickname' %}">
+    {% csrf_token %}
+    <p>当前昵称：{{ user.nickname }}</p>
+    新昵称：<input type="text" id="nickname" name="nickname">
+    <p id="tips_nickname" style="color: red">{{ error_msg }}</p>
+    <input type="button" onclick="set_submit(this.form)" value="确定">
+</form>
+
+<script type="text/javascript">
+    document.getElementById("nickname").value = "{{ nickname }}"
+    function set_submit(obj) {
+        nickname = document.getElementById("nickname").value.trim();
+        if (nickname.length == 0 || nickname.length > 30) {
+            document.getElementById("tips_nickname").innerHTML = "昵称1-30个字符";
+        }
+        else {
+            obj.submit()
+        }
+    }
+</script>
+
+{% endblock content %}

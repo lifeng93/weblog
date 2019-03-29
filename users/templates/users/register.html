@@ -1,0 +1,267 @@
+{% extends "users/base_form.html" %}
+
+{% block header %}
+    <title>注册-星博客</title>
+{% endblock header %}
+
+{% block content %}
+    <div class="divform">
+        <div class="div_form_title">注册</div>
+        <form method="POST" action="{% url 'users:actual_register' %}">
+            {% csrf_token %}
+            <ul>
+                <li>
+                    <span>昵称</span>
+                    <input id="nickname" type="text" name="nickname" oninput="verify_nickname(this.value)" class="long_input" >
+                    <p id="tips_nickname">{{ nickname_error }}</p>
+                </li>
+                <li>
+                    <span>手机号码</span>
+                    <input id="phone" name="phone" type="text" oninput="verify_phone(this.value.trim())" class="long_input" >
+                    <p id="tips_phone">{{ phone_error }}</p>
+                </li>
+                <li>
+                    <span>验证码</span>
+                    <input id="captcha" name="captcha" type="text" class="short_input" ="verify_captcha(this.value.trim())" onkeypress="if(event.keyCode==13) focusNextInput(this);">
+                    <img id="captcha_img" class="captcha" src="{% url 'users:get_captcha' %}" alt="captcha">
+                    <input type="button" onclick="new_captcha()" value="换一张">
+                    <p id="tips_captcha"></p>
+                </li>
+                <li>
+                    <span>短信验证码</span>
+                    <input id="msg_code" name="msg_code" type="text" onchange="verify_msg_code(this.value.trim())" class="short_input">
+                    <input id="send_button" type="button" value="获取短信验证码" onclick="send_msg(this)">
+                    <p id="tips_msg">{{ msg_error }}</p>
+                </li>
+                <li>
+                    <span>密码</span>
+                    <input type="password" id="password" name="password" oninput="verify_password(this.value.trim())" placeholder="至少8位，包含字母和数字" >
+                    <p id="tips_password">{{ password_error }}</p>
+                </li>
+                <li>
+                    <span>确认密码</span>
+                    <input type="password" id="password2" name="password2" oninput="verify_password2(this.value)">
+                </li>
+                <li>
+                    <input type="button" value="提交" onclick="register_submit(this.form)" class="button">
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("nickname").value = "{{ nickname }}"
+        document.getElementById("phone").value = "{{ phone }}"
+        document.getElementById("msg_code").value = "{{ msg_code }}"
+
+
+        function verify_nickname(nickname) {
+            document.getElementById("tips_nickname").innerHTML = "";
+            if (nickname.length == 0 || nickname.length > 30) {
+                document.getElementById("tips_nickname").innerHTML = "昵称1-30个字符";
+            }
+            else {
+                $.ajaxSetup({
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });
+                $.ajax({
+                    url: "{% url 'users:ajax_nickname' %}",
+                    type: 'POST',
+                    async: false,
+                    data: {
+                        nickname: nickname
+                    },
+                    success: function (error_msg) {
+                        document.getElementById("tips_nickname").innerHTML = "" + error_msg;
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+            }
+        }
+
+        function verify_phone(phone){
+            document.getElementById('tips_msg').innerHTML = '';
+            if(!(/^1[34578]\d{9}$/.test(phone))){
+                document.getElementById("tips_phone").innerHTML="手机号非法";
+            }
+            else {
+                $.ajaxSetup({
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });
+                $.ajax({
+                    url: "{% url 'users:ajax_phone' %}",
+                    type: 'POST',
+                    async: false,
+                    data: {
+                        phone: phone
+                    },
+                    success: function (error_msg) {
+                        document.getElementById("tips_phone").innerHTML = "" + error_msg;
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+            }
+        }
+
+        function verify_captcha(captcha){
+            document.getElementById("tips_captcha").innerHTML="";
+            if (!(/^[a-z0-9]{6}$/.test(captcha))){
+                document.getElementById("tips_captcha").innerHTML="验证码非法";
+            }
+        }
+
+        function new_captcha(){
+            var img = document.getElementById("captcha_img");
+            img.src = "{% url 'users:get_captcha' %}?1=" + Math.random()
+        }
+
+        var count = 60;
+        function settime(obj) {
+            if (count == 0) {
+                obj.removeAttribute("disabled");
+                obj.value="重新获取";
+                count = 60;
+            } else {
+                obj.setAttribute("disabled", true);
+                obj.value="重新发送(" + count + ")";
+                count--;
+                setTimeout(function() {
+                    settime(obj)
+                },1000)
+            }
+        }
+
+
+
+        function send_msg(obj){
+            captcha = document.getElementById("captcha").value.trim();
+            phone = document.getElementById('phone').value.trim();
+            if(!(/^[a-z0-9]{6}$/.test(captcha.trim()))){
+                document.getElementById("tips_captcha").innerHTML="验证码错误";
+            }
+            else if (!(/^1[34578]\d{9}$/.test(phone))) {
+                document.getElementById("tips_phone").innerHTML="手机号非法";
+            }
+            else {
+                $.ajaxSetup({
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });
+                $.ajax({
+                    url: "{% url 'users:ajax_send_msg' %}",
+                    type: 'POST',
+                    data: {
+                        phone: phone,
+                        captcha: captcha
+                    },
+                    success: function (error_msg) {
+                        if (error_msg == '验证码错误'){
+                            document.getElementById("tips_captcha").innerHTML = "" + error_msg;
+                            new_captcha();
+                        }
+                        else if (error_msg == '手机号已被注册'){
+                            document.getElementById("tips_phone").innerHTML = "" + error_msg;
+                        }
+                        else if (error_msg == "今日发送次数已达上限"){
+                            document.getElementById("tips_msg").innerHTML = "" + error_msg;
+                            obj.setAttribute("disabled", true);
+                        }
+                        else if (error_msg == '短信成功发送'){
+                            document.getElementById("tips_msg").innerHTML = "" + error_msg;
+                            settime(obj);
+                        }
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+            }
+        }
+
+        function verify_msg_code(msg_code){
+            phone = document.getElementById('phone').value.trim();
+            document.getElementById("tips_msg").innerHTML="";
+            if (!(/^\d{6}$/.test(msg_code))) {
+                document.getElementById("tips_msg").innerHTML="验证码错误";
+            }
+            else {
+                $.ajaxSetup({
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });
+                $.ajax({
+                    url: "{% url 'users:ajax_msg_code' %}",
+                    async: false,
+                    type: 'POST',
+                    data:{
+                        phone: phone,
+                        msg_code: msg_code
+                    },
+                    success: function (error_msg) {
+                        document.getElementById("tips_msg").innerHTML = "" + error_msg;
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+            }
+        }
+
+        function verify_password(password){
+            document.getElementById("tips_password").innerHTML="";
+            if (/^[0-9]+$/.test(password)) {
+                document.getElementById("tips_password").innerHTML="密码不可以全为数字";
+            }
+            else if(password.length < 8){
+                document.getElementById("tips_password").innerHTML="密码至少8个字符";
+            }
+            else {
+                $.ajaxSetup({
+                    data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                });
+                $.ajax({
+                    url: "{% url 'users:ajax_password' %}",
+                    type: 'POST',
+                    // async: false,
+                    data: {
+                        password: password
+                    },
+                    success: function (error_msg) {
+                        document.getElementById("tips_password").innerHTML="" + error_msg;
+                    },
+                    error: function (err) {
+                        alert(err);
+                    }
+                });
+            }
+        }
+
+        function verify_password2(str){
+            password = document.getElementById("password").value
+            password2 = document.getElementById("password2").value
+            if (password != password2){
+                document.getElementById("tips_password").innerHTML="密码不一致";
+            }
+            else {
+                document.getElementById("tips_password").innerHTML="";
+            }
+        }
+
+        function register_submit(obj) {
+            nickname = document.getElementById("nickname").value.trim();
+            phone = document.getElementById("phone").value.trim();
+            msg_code = document.getElementById("msg_code").value.trim();
+            password = document.getElementById("password").value.trim();
+            password2 = document.getElementById("password2").value
+
+            if (!(/^\d{6}$/.test(msg_code))) {
+                document.getElementById("tips_msg").innerHTML="验证码错误";
+            }
+            else {
+                obj.submit();
+            }
+        }
+    </script>
+{% endblock content %}

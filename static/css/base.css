@@ -1,0 +1,68 @@
+.head_div {
+    height: 65px;
+    background-color: white;
+    position: relative;
+}
+
+.logo_div
+{
+    display: inline-block;
+    width: 15%;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    left: 2%;
+    transform: translate(0, -50%);
+}
+
+.logo_circle_div {
+    display: inline-block;
+    width: 65px;
+    height: 65px;
+    position: absolute;
+    top: 50%;
+    left: 1%;
+    transform: translate(0, -50%);
+}
+
+
+.homeuser_div {
+    display: inline-block;
+    width: 30%;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    left: 7%;
+    transform: translate(0, -50%);
+    line-height: 50px;
+    font-size: 30px;
+    font-weight: 550;
+    color: rgb(6, 7, 87);
+}
+
+.nav_div {
+    display: inline-block;
+    width: 60%;
+    height: 50px;
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(0, -50%);
+}
+
+.user_nav_div {
+    display: inline-block;
+    width: 90%;
+    position: absolute;
+    top: 75%;
+
+}
+
+.user_nav
+{
+    font-family: Arial, Helvetica, sans-serif;
+    height: 16px;
+    line-height: 16px;
+    font-size: 14px;
+    text-align: right;
+}

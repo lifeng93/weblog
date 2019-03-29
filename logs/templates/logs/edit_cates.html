@@ -1,0 +1,145 @@
+{% extends 'users/base.html' %}
+{% block header %}
+<title>编辑分类-星博客</title>
+{% load static from staticfiles %}
+{% endblock header %}
+
+{% block content %}
+<hr>
+<input type="button" value="添加分类" onclick="click_add_cate()"><br><br>
+<div id="div_add_cate" style="display:none">
+    <span>分类名称：</span>
+    <input type="text" name="cate_name" id="cate_name" style="border: grey 1px solid;">
+    <input type="button" value="确定" onclick="submit_add_cate()">
+    <input type="button" value="取消" onclick="cancel_add_cate()">
+</div>
+<p id="tips_add_cate" style="font-size:12px; color:red;"></p>
+<select id="cate_select"></select>
+<input type="button" value="删除" onclick="del_cate()">
+<input type="button" value="重命名" onclick="click_rename_cate()"><br><br>
+<div id="div_rename_cate" style="display:none">
+    <span>新名称：</span>
+    <input type="text" name="new_cate_name" id="new_cate_name" style="border: grey 1px solid;">
+    <input type="button" value="确定" onclick="submit_rename_cate()">
+    <input type="button" value="取消" onclick="cancel_rename_cate()">
+</div>
+<p id="tips_cate" style="font-size:12px; color:red;"></p>
+
+<script>
+    window.onload = function () {
+        get_cate_list();
+    }
+    function get_cate_list() {
+        $("#cate_select").empty();
+        $.ajax({
+            url: "{% url 'logs:ajax_get_cates' %}",
+            type: "GET",
+            dataType: "json",
+            success: function (result) {
+                $.each(JSON.parse(result.cates), function (index, item) {
+                    id = item["id"];
+                    cate_name = item["cate_name"];
+                    var option = document.createElement("option");
+                    option.value = id
+                    option.innerHTML = cate_name
+                    var div = document.getElementById("cate_select");
+                    div.appendChild(option);
+                })
+                document.getElementById("div_add_cate").style.display = "none";
+            }
+        });
+    }
+    function click_add_cate() {
+        document.getElementById("tips_cate").innerHTML = "";
+        document.getElementById("div_add_cate").style.display = "block";
+    }
+    function cancel_add_cate() {
+        document.getElementById("tips_add_cate").innerHTML = "";
+        document.getElementById("div_add_cate").style.display = "none";
+    }
+    function submit_add_cate() {
+        cate = document.getElementById("cate_name").value.trim();
+        if (cate.length == 0) {
+            document.getElementById("tips_add_cate").innerHTML = "分类名不能为空";
+        }
+        else if(cate.length > 20){
+            document.getElementById("tips_add_cate").innerHTML = "长度不能超过20个字符";
+        }
+        else {
+            $.ajaxSetup({
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+            });
+            $.ajax({
+                url: "{% url 'logs:ajax_add_cate' %}",
+                type: 'POST',
+                async: false,
+                data: {
+                    cate_name: cate
+                },
+                success: function (error_msg) {
+                    document.getElementById("tips_add_cate").innerHTML = "" + error_msg;
+                    if (error_msg == "") {
+                        get_cate_list();
+                        document.getElementById("tips_add_cate").innerHTML = "添加分类成功" ;
+                    }
+                },
+                error: function (err) {
+                    alert(err);
+                }
+            });
+        }
+    }
+
+    function del_cate() {
+        var select = document.getElementById("cate_select");
+        var select_index = select.selectedIndex;
+        var id = select.options[select_index].value;
+        $.ajax({
+            url: "{% url 'logs:del_cate' 0 %}".replace('0', id),
+            type: "GET",
+            success: function (msg) {
+                document.getElementById("tips_cate").innerHTML = "" + msg;
+                get_cate_list();
+            }
+        });
+    }
+
+    function click_rename_cate() {
+        document.getElementById("div_rename_cate").style.display = "block";
+    }
+
+    function cancel_rename_cate() {
+        document.getElementById("tips_cate").innerHTML = "";
+        document.getElementById("div_rename_cate").style.display = "none";
+    }
+
+    function submit_rename_cate() {
+        var cate_id = $("#cate_select option:selected").val();
+        new_cate_name = document.getElementById("new_cate_name").value;
+        $.ajaxSetup({
+            data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+        });
+        $.ajax({
+            url: "{% url 'logs:rename_cate' 0 %}".replace('0', cate_id),
+            type: "POST",
+            data: {
+                new_cate_name: new_cate_name
+            },
+            success: function (msg) {
+                document.getElementById("tips_cate").innerHTML = "" + msg;
+                if (msg == "分类重命名成功") {
+                    get_cate_list();
+                    document.getElementById("div_rename_cate").style.display = "none";
+                }
+            }
+        });
+    }
+
+    $("#cate_select").change(function () {
+        document.getElementById("tips_add_cate").innerHTML = "";
+        document.getElementById("tips_cate").innerHTML = "";
+    });
+
+</script>
+
+{% endblock content %}

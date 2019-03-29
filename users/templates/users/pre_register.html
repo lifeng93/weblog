@@ -1,0 +1,10 @@
+{% extends "users/base.html" %}
+
+{% block header %}
+<title>注册-星博客</title>
+{% endblock header %}
+
+{% block content %}
+<p>请先将浏览器设置为允许网站保存和读取cookie数据</p>
+<p>完成后请点击：<a href="{% url 'users:register' %}">已启用cookie</a></p>
+{% endblock content %}

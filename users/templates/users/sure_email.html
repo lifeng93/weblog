@@ -1,0 +1,10 @@
+{% extends "users/base.html" %}
+
+{% block header %}
+<title>确认邮箱-星博客</title>
+{% endblock header %}
+
+{% block content %}
+<p>确认链接已发至您的邮箱 {{ email }}，确认后才能完成绑定，请注意查收！</p>
+<p><a href="{% url 'users:set_email' %}">重新填写邮箱</a></p>
+{% endblock content %}

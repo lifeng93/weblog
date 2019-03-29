@@ -1,0 +1,80 @@
+.divform {
+    width: 380px;
+    height: 450px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    background-color: rgb(248, 248, 246);
+    border:1px solid #000;
+}
+
+.div_form_title {
+    height: 40px;
+    background-color: cornflowerblue;
+    color: aliceblue;
+    font-size: 18px;
+    text-align: center;
+    line-height: 40px;
+}
+
+.captcha {
+    display: inline-block;
+    width: 30%;
+}
+
+
+ul li {
+    list-style-type: none;
+}
+
+ul li span{
+    display: inline-block;
+    width: 25%;
+    font-size: 15px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: darkslategray;
+}
+
+ul li span a{
+    color: blue;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+ul li .long_input{
+    display: inline-block;
+    width: 60%;
+}
+
+ul li .short_input {
+    display: inline-block;
+    width: 20%;
+}
+
+ul li p{
+    display: block;
+    padding-left: 27%;
+    height: 10px;
+    color: crimson;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 11px;
+}
+
+.checkbox_div {
+    margin-top: 5px;
+    margin-left: 25%;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: gray;
+}
+
+.button {
+    position: relative;
+    top: 16px;
+    left: 27%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-size: 16px;
+    text-align: center;
+    width: 70px;
+}

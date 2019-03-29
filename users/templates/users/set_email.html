@@ -1,0 +1,28 @@
+{% extends "users/base_form.html" %}
+
+{% block header %}
+<title>设置邮箱</title>
+{% endblock header %}
+
+{% block content %}
+<form method="POST" action="{% url 'users:set_email' %}">
+	{% csrf_token %}
+	<p>原邮箱账号：{{ user.email }}</p>
+	新邮箱账号：<input type="text" id="email" name="email">
+	<p id="tips_email" style="color: red">{{ error_msg }}</p>
+	<input type="button" onclick="set_submit(this.form)" value="确定">
+</form>
+
+<script>
+	document.getElementById("email").value = "{{ email }}"
+	function set_submit(obj) {
+		email = document.getElementById("email").value.trim();
+		if (!(/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(email))) {
+			document.getElementById("tips_email").innerHTML="邮箱不合法"
+		}
+		else {
+			obj.submit()
+		}
+	}
+</script>
+{% endblock content %}
