@@ -1,6 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
+import os
 import random
 from io import BytesIO
+from django.conf import settings
 
 
 class Captcha:
@@ -30,7 +32,8 @@ class Captcha:
         NUM_CHAR = 6
         FONT_SIZE = 22
 
-        FONT = "/usr/shard/fonts/myfont/msyh.ttf"
+        # FONT = os.path.join(settings.BASE_DIR, 'static/fonts/msyh.ttf')
+        FONT = '/var/www/shared/fonts/msyh.ttf'
         font = ImageFont.truetype(FONT, size=FONT_SIZE)
         for i in range(NUM_CHAR):
             char = self.get_random_char()

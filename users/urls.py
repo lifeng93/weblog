@@ -28,7 +28,7 @@ urlpatterns = [
     path("reset_password/", views.reset_password, name="reset_password"),
     path("reset_nickname/", views.reset_nickname, name="reset_nickname"),
     path("set_center_options/", views.set_center_options, name="set_center_options"),
-    path("base_header/", views.base_header, name="base_header"),
+    path("set_center_header/", views.set_center_header, name="set_center_header"),
     path("blank/", views.blank, name="blank"),
 
 ]

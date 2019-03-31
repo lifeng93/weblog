@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import  HttpResponse
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from users.decorators import referer_required
+from users.decorators import referer_required, ajax_required
 from django.http import Http404
 
 User = get_user_model()
@@ -50,6 +50,7 @@ def new_article(request):
 url为:http://127.0.0.1:8000/article_upload/?dir=media post请求
 '''
 @csrf_exempt
+@referer_required
 def article_upload(request):
 	'''
 	kindeditor图片上传返回数据格式说明：
@@ -117,7 +118,7 @@ def process_upload(files, upload_type):
 
 """ end 富文本编辑器上传图片 """
 
-
+@ajax_required
 @login_required
 def ajax_add_cate(request):
 	"添加个人分类"
@@ -136,6 +137,8 @@ def ajax_add_cate(request):
 
 from django.core.serializers.json import DjangoJSONEncoder
 
+
+@login_required
 def ajax_get_cates(request):
 	"获取个人分类列表"
 	cates = Category.objects.filter(owner=request.user).values('id', 'cate_name')
@@ -219,7 +222,7 @@ def cate_null(request, user_id):
 def edit_cates(request):
 	return render(request, 'logs/edit_cates.html', locals())
 
-
+@ajax_required
 @login_required
 def del_cate(request, cate_id):
 	category = get_object_or_404(Category, id=cate_id, owner=request.user)
@@ -229,6 +232,7 @@ def del_cate(request, cate_id):
 	return HttpResponse("删除分类成功")
 
 
+@ajax_required
 @login_required
 def rename_cate(request, cate_id):
 	if request.method == 'POST':

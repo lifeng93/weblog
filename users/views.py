@@ -103,7 +103,7 @@ def ajax_msg_code(request):
         return HttpResponse(error_msg)
 
 def get_common_passwords():
-    password_list_path = os.path.join(settings.BASE_DIR, 'static/txt/common-passwords.txt.gz')
+    password_list_path = os.path.join(settings.SOURCE_DIR, 'common-passwords.txt.gz')
     try:
         with gzip.open(password_list_path) as f:
             common_passwords_lines = f.read().decode().splitlines()
@@ -141,6 +141,7 @@ def pre_register(request):
     else:
         return render(request, 'users/pre_register.html')
 
+
 @referer_required
 def actual_register(request):
     if request.method == 'POST':
@@ -174,6 +175,7 @@ def actual_register(request):
             msg_send_log.save()
             return HttpResponseRedirect(reverse('users:register_success'))
     return render(request, 'users/register.html', locals())
+
 
 @referer_required
 def register_success(request):
@@ -263,6 +265,7 @@ def set_password(request):
             return HttpResponseRedirect(reverse('users:setpwd_success'))
     return render(request, 'users/set_password.html', locals())
 
+
 @referer_required
 def setpwd_success(request):
     return render(request, 'users/setpwd_success.html')
@@ -280,7 +283,7 @@ def set_email(request):
             user = User.objects.get(phone=phone)
             email_token_generator = EmailSetTokenGenerator()
             token = email_token_generator.make_token(user)
-            server_host = "http://127.0.0.1:8000/"
+            server_host = "http://39.108.217.214"
             token_url = server_host + "/set_email/token=" + token
             # 发送邮件 链接
             from_email = settings.DEFAULT_FROM_EMAIL
@@ -384,6 +387,6 @@ def blank(request):
 def set_center_options(request):
     return render(request, 'users/set_center_options.html')
 
-def base_header(request):
+def set_center_header(request):
     request_path = request.GET.get("next")
-    return render(request, 'users/base.html', locals())
+    return render(request, 'users/set_center_header.html', locals())
