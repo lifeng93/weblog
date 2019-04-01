@@ -1,0 +1,109 @@
+{% extends "users/base_form.html" %}
+
+{% block header %}
+<title>重置手机</title>
+{% endblock header %}
+
+{% block content %}
+<form method="POST" action="{% url 'users:reset_phone' %}">
+    {% csrf_token %}
+    <p>当前手机号码：{{ user.phone }}</p>
+    新手机号码：<input type="text" id="phone" name="phone">
+    <p id="tips_phone" style="color: red">{{ phone_error }}</p>
+    验证码：<input id="captcha" name="captcha" type="text">
+    <img id="captcha_img" src="{% url 'users:get_captcha' %}" alt="captcha">
+    <input type="button" onclick="new_captcha()" value="换一张">
+    <p id="tips_captcha" style="color: red"></p>
+    短信验证码：<input type="text" id="msg_code" name="msg_code"> 
+    <input id="send_button" type="button" value="获取短信验证码" onclick="send_msg(this)">
+    <p id="tips_msg" style="color: red">{{ msg_error }}</p>
+    <input type="button" onclick="set_submit(this.form)" value="确定">
+</form>
+
+<script type="text/javascript">
+    document.getElementById("phone").value = "{{ phone }}"
+    document.getElementById("msg_code").value = "{{ msg_code }}"
+    function new_captcha(){
+        var img = document.getElementById("captcha_img");
+        img.src = "{% url 'users:get_captcha' %}?1=" + Math.random()
+    }
+
+    var count = 60;
+    function settime(obj) {
+        if (count == 0) {
+            obj.removeAttribute("disabled");
+            obj.value="重新获取";
+            count = 60;
+        } else {
+            obj.setAttribute("disabled", true);
+            obj.value="重新发送(" + count + ")";
+            count--;
+            setTimeout(function() {
+                settime(obj)
+            },1000)
+        }
+    }
+
+    function send_msg(obj){
+        captcha = document.getElementById("captcha").value.trim();
+        phone = document.getElementById('phone').value.trim();
+        if(!(/^[a-z0-9]{6}$/.test(captcha.trim()))){
+            document.getElementById("tips_captcha").innerHTML="验证码错误";
+        }
+        else if (!(/^1[34578]\d{9}$/.test(phone))) {
+            document.getElementById("tips_phone").innerHTML="手机号非法";
+        }
+
+        else {
+            phone = document.getElementById('phone').value.trim();
+            $.ajaxSetup({
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+            });
+            $.ajax({
+                url: "{% url 'users:ajax_send_msg' %}",
+                type: 'POST',
+                data: {
+                    phone: phone,
+                    captcha: captcha
+                },
+                success: function (error_msg) {
+                    if (error_msg == '验证码错误'){
+                        document.getElementById("tips_captcha").innerHTML = "" + error_msg;
+                        new_captcha();
+                    }
+                    else if (error_msg == '手机号已被注册'){
+                        document.getElementById("tips_phone").innerHTML = "" + error_msg;
+                        document.getElementById("tips_captcha").innerHTML = ""
+                    }
+                    else if (error_msg == "今日发送次数已达上限"){
+                        document.getElementById("tips_msg").innerHTML = "" + error_msg;
+                    }
+                    else if (error_msg == '短信成功发送'){
+                        document.getElementById("tips_msg").innerHTML = "" + error_msg;
+                        document.getElementById("tips_phone").innerHTML = ""
+                        document.getElementById("tips_captcha").innerHTML = ""
+                        settime(obj);
+                    }
+                },
+                error: function (err) {
+                    alert(err);
+                }
+            });
+        }
+    }
+
+    function set_submit(obj) {
+        phone = document.getElementById("phone").value.trim();
+        msg_code = document.getElementById("msg_code").value.trim();
+        if (!(/^1[34578]\d{9}$/.test(phone))) {
+            document.getElementById("tips_phone").innerHTML="手机号非法";
+        }
+        else if (!(/^\d{6}$/.test(msg_code))) {
+            document.getElementById("tips_msg").innerHTML="验证码错误";
+        }
+        else {
+            obj.submit()
+        }
+    }
+</script>
+{% endblock content %}

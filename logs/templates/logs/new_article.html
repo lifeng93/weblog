@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>写文章-StarBlog</title>
+        {% load static from staticfiles %}
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <link rel="stylesheet" type="text/css" href="{% static 'css/edit.css' %}">
+        <script charset="utf-8" src="{% static 'js/kindeditor/kindeditor-all-min.js' %}"></script>
+        <script charset="utf-8" src="{% static 'js/kindeditor/lang/zh-CN.js' %}"></script>
+        <script>
+            KindEditor.ready(function(K) {
+                    window.editor = K.create('textarea[name="content"]', {
+                        uploadJson: "{% url 'logs:article_upload' %}",
+                    });
+            });
+        </script>
+    </head>
+    <body>
+        <div class="div_edit">
+            <form method="POST" action="{% url 'logs:new_article' %}" class="div_form">
+                {% csrf_token %}
+                <span>标题</span><br>
+                <input type="text" name="title" id="title" class="input_title">
+                <p></p>
+                <textarea id = "editor_id"  name = "content" class="textarea"></textarea>
+                <p></p>
+                <div id="div_cate">
+                    <span>分类：</span>
+                    <div id="div_cate_list">
+                        <input type="radio" name="category" value="不分类">不分类
+                    </div>
+                    <input type="button" value="+分类" onclick="add_cate()">
+                    <div id="div_add_cate" style="display:none">
+                        <span>分类名称：</span>
+                        <input type="text" name="cate_name" id="cate_name" style="border: grey 1px solid;">
+                        <input type="button" value="确定" onclick="submit_add_cate()">
+                        <input type="button" value="取消" onclick="cancel_add_cate()">
+                    </div>
+                    <p id="tips_add_cate" class="tips"></p>
+                </div>
+                <input type="checkbox" name="is_public">公开
+                <input type="checkbox" name="is_public_index">发布到网站首页
+                <input type="checkbox" name="can_comment">不允许评论
+                <p id="tips_error" class="tips"></p>
+                <input id="submit_button" type="button" value="提交" onclick="article_submit(this.form)">
+            </form>
+        </div>
+        
+
+        <script>
+            window.onload = function (){
+                get_cate_list();
+            }
+            function get_cate_list(){
+                $.ajax({
+                    url:"{% url 'logs:ajax_get_cates' %}",
+                    type: "GET",
+                    dataType:"json",
+                    success: function(result){
+                        $.each(JSON.parse(result.cates), function(index, item){
+                            id = item["id"];
+                            cate_name = item["cate_name"];
+                            var input = document.createElement("input");
+                            input.type = "radio";
+                            input.name = "category";
+                            input.value = "" + id;
+                            input.id = "category_" + id;
+                            var label = document.createElement("label");
+                            label.for = input.id;
+                            label.innerHTML = cate_name;
+                            var div = document.getElementById("div_cate_list");
+                            div.appendChild(input);
+                            div.appendChild(label);
+                        })
+                        cancel_add_cate();
+                    }
+                });
+            }
+            function add_cate() {
+                document.getElementById("div_add_cate").style.display = "block";
+            }
+            function cancel_add_cate(){
+                document.getElementById("tips_add_cate").innerHTML = "";
+                document.getElementById("div_add_cate").style.display = "none";
+            }
+            function submit_add_cate() {
+                cate = document.getElementById("cate_name").value.trim();
+                if (cate.length == 0) {
+                    document.getElementById("tips_add_cate").innerHTML = "分类名不能为空";
+                }
+                else if(cate.length > 20){
+                    document.getElementById("tips_add_cate").innerHTML = "长度不能超过20个字符";
+                }
+                else {
+                    $.ajaxSetup({
+                        data: { csrfmiddlewaretoken: '{{ csrf_token }}' },
+                    });
+                    $.ajax({
+                        url: "{% url 'logs:ajax_add_cate' %}",
+                        type: 'POST',
+                        async: false,
+                        data: {
+                            cate_name: cate
+                        },
+                        success: function (error_msg) {
+                            document.getElementById("tips_add_cate").innerHTML = "" + error_msg;
+                            if (error_msg == "") {
+                                get_cate_list();
+                            }
+                        },
+                        error: function (err) {
+                            alert(err);
+                        }
+                    });
+                }
+            }
+
+            function article_submit(obj) {
+                title = document.getElementById("title").value;
+                if (title.length == 0) {
+                    document.getElementById("tips_error").innerHTML = "文章标题为空";
+                }
+                else {
+                    editor.sync();
+                    obj.submit();
+                    document.getElementById("submit_button").setAttribute("disabled", true);
+                }
+            }
+        </script>
+    </body>
+</html>

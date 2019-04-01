@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>主页左边栏</title>
+    {% load static from staticfiles %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/home_left.css' %}">
+</head>
+
+<body>
+    <h4>分类：</h4>
+    {% if user == request.user %}
+        <a href="{% url 'logs:edit_cates' %}" target="_top">编辑分类</a><br><br>
+    {% endif %}
+    <div id="cate_list" class="div_cate_list">
+        <a href="{% url 'logs:cate_null' user_id %}" target="show">不分类</a><br>
+    </div>
+    {% if user == request.user %}
+        <div class="div_recycle_enter">
+            <a href="{% url 'logs:recycle_bin' %}" target="show">回收站</a>
+        </div>
+    {% endif %}
+    <script>
+        function list_cates(){
+            $.ajax({
+                url: "{% url 'logs:ajax_home_cates_list' user_id %}",
+                type: 'get',
+                dataType: 'json',
+                success: function(result){
+                    $.each(JSON.parse(result.cates), function(index, item){
+                        cate_name = item['cate_name'];
+                        var id = item['id'];
+                        var a = document.createElement('a');
+                        a.innerHTML = cate_name;
+                        a.href = "{% url 'logs:cate' 0 %}".replace('0', id);
+                        a.target = "show"
+                        var br = document.createElement('br');
+                        var div = document.getElementById('cate_list');
+                        div.appendChild(a);
+                        div.appendChild(br);
+                    });
+                }
+            });
+        }
+        window.onload = function (){
+            list_cates();
+        }
+    </script>
+</body>
+
+</html>

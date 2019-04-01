@@ -1,0 +1,9 @@
+{% extends "users/base.html" %}
+
+{% block header %}
+<title>注册成功-星博客</title>
+{% endblock header %}
+
+{% block content %}
+<p>注册成功！<a href="{% url 'users:set_email' %}">绑定邮箱</a></p>
+{% endblock content %}

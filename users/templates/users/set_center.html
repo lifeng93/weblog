@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>设置中心</title>
+</head>
+<frameset rows="13%,87%" border=2px solid #000; noresize="noresize">
+    <frame src="{% url 'users:set_center_header' %}?next={{ request.path }}"; scrolling="no"; />
+    <frameset cols="20%,80%" frameborder="yes" border=2px solid #000; noresize="noresize">
+        <frame src="{% url 'users:set_center_options' %}" marginwidth="30px" scrolling="no";/>
+        <frame src="{% url 'users:blank' %}" name="show" />
+    </frameset>
+</frameset>
+</html>
+

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    {% load static from staticfiles %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    {% block header %}{% endblock header %}
+</head>
+
+<body>
+    <div class="head_div">
+        <div class="logo_circle_div">
+            <a href="{% url 'users:index' %}" target="_top"><img src="{% static 'image/logo_.png' %}"></a>
+        </div>
+        <div class="homeuser_div">
+            <a href="{% url 'logs:userhome' user.id %}" target="_top">{{ user.nickname|truncatechars:13}}</a>
+        </div>
+        <div class="nav_div">
+            <div class="user_nav_div">
+                {% if user.is_authenticated %}
+                <nav class="user_nav">
+                    <a href="{% url 'logs:new_article' %}" target="_blank">写博客</a>&nbsp;·
+                    <a href="{% url 'users:set_center' %}" target="_top">设置中心</a>&nbsp;·
+                    <a href="{% url 'users:logout' %}" target="_top">退出</a>
+                </nav>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% block content %}{% endblock content %}
+</body>
+
+</html>
+

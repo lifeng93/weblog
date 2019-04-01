@@ -1,0 +1,28 @@
+{% extends "users/base.html" %}
+
+{% block header %}
+<title>首页-星博客</title>
+{% load static from staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/article_list.css' %}">
+{% endblock header %}
+
+
+{% block content %}
+    <hr>
+    <div class="div_article_list">
+        {% for article in articles %}
+            <div class="div_article">
+                <h4><a href="{% url 'logs:article' article.id %}">{{ article.title }}</a></h4>
+                <div class="div_info">
+                    <span>发布时间：{{ article.create_time |date:"Y/m/d/H:i"}}</span>&nbsp;&nbsp;
+                    <span>作者：{{ article.author }}</span>&nbsp;&nbsp;
+                    <span>阅读量：{{ article.reads }}</span>
+                </div>
+                <div class="div_digest">
+                    {{ article.content | striptags | truncatechars:200 }}
+                </div>
+            </div>
+        {% empty %} 暂无文章。
+        {% endfor %}
+    </div>
+{% endblock content %}

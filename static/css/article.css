@@ -1,0 +1,16 @@
+.div_article {
+    position: absolute;
+    width: 65%;
+    border: 1px solid white;
+    left: 50%;
+    transform: translate(-50%, 0px);
+    padding: 15px;
+    word-wrap: break-word;
+}
+
+.div_info {
+    font-size: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    color: darkgreen;
+    margin-bottom: 25px;
+}

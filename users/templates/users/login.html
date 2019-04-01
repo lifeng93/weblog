@@ -1,0 +1,66 @@
+{% extends "users/base_form.html" %}
+
+{% block header %}
+<title>登录-星博客</title>
+{% endblock header %}
+
+{% block content %}
+<div class="divform">
+        <div class="div_form_title">登录</div>
+        <form method="POST" action="{% url 'users:login' %}">
+            {% csrf_token %}
+            <ul>
+                <li>
+                    <span>手机号码</span>
+                    <input id="phone" name="phone" type="text" class="long_input" onfocus="clear_phone_error()">
+                    <p id="tips_phone">{{ phone_error }}</p>
+                </li>
+                <li>
+                    <span>密码<a href="{% url 'users:set_password' %}">（重置）</a></span>
+                    <input id="password" name="password" type="password" class="long_input">
+                    <p id="tips_password">{{ password_error }}</p>
+                </li>
+                <li>
+                    <span>验证码</span>
+                    <input type="text" class="short_input" name="captcha" id="captcha" onfocus="clear_error()">
+                    <img id="captcha_img" class="captcha" alt="captcha">
+                    <input type="button" value="换一张" onclick="new_captcha()">
+                    <p id="tips_captcha">{{ captcha_error }}</p>
+                </li>
+                <li class="checkbox_div">
+                    <input type="checkbox" id="auto_login" name="auto_login">十天内自动登录
+                </li>
+                <li>
+                    <input type="button" value="登录" onclick="login_submit(this.form)" class="button">
+                    <input type="hidden" name="next" value="{{ next }}">
+                </li>
+            </ul>
+        </form>
+    </div>
+
+    <script>
+        window.onload = function(){
+            new_captcha();
+        }
+        document.getElementById("phone").value = "{{ phone }}"
+        function clear_phone_error(){
+            document.getElementById("tips_phone").innerHTML = "";
+        }
+        function new_captcha(){
+            var img = document.getElementById("captcha_img");
+            img.src = "{% url 'users:get_captcha' %}?1=" + Math.random()
+        }
+        function clear_error(){
+            document.getElementById("tips_captcha").innerHTML = "";
+        }
+        function login_submit(obj){
+            phone = document.getElementById("phone").value.trim();
+            if (!(/^1[34578]\d{9}$/.test(phone))) {
+                document.getElementById("tips_phone").innerHTML="手机号非法";
+            }
+            else {
+                obj.submit();
+            }                        
+        }
+    </script>
+{% endblock content %}

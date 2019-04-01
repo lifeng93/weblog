@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主页</title>
+</head>
+<frameset rows="13%,87%" border=2px solid #000; noresize="noresize">
+    <frame src="{% url 'logs:userhome_header' user_id %}?next={{ request.path }}"; scrolling="no"; />
+    <frameset cols="20%,80%" frameborder="yes" border=2px solid #000; noresize="noresize">
+        <frame src="{% url 'logs:home_list_cates' user_id %}" marginwidth="30px";/>
+        <frame src="{% url 'logs:home_new_articles' user_id %}" name="show" />
+    </frameset>
+</frameset>
+</html>
+
