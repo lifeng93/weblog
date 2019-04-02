@@ -26,8 +26,6 @@ def new_article(request):
 		title = request.POST['title']
 		content = request.POST['content']
 		category = request.POST.get('category')
-		if category == "不分类":
-			category = None
 		article = Article.objects.create(title=title, content=content, author=request.user, cate_id=category )
 		is_public = request.POST.get('is_public')
 		is_public_index = request.POST.get('is_public_index')
@@ -297,8 +295,6 @@ def update_article(request, article_id):
 		title = request.POST['title']
 		content = request.POST['content']
 		category = request.POST.get('category')
-		if category == "不分类":
-			category = None
 		article = get_object_or_404(Article, id=article_id, author=request.user)
 		article.title = title
 		article.content = content

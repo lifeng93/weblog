@@ -10,9 +10,9 @@
         <script charset="utf-8" src="{% static 'js/kindeditor/lang/zh-CN.js' %}"></script>
         <script>
             KindEditor.ready(function(K) {
-                    window.editor = K.create('textarea[name="content"]', {
-                        uploadJson: "{% url 'logs:article_upload' %}",
-                    });
+                window.editor = K.create('textarea[name="content"]', {
+                    uploadJson: "{% url 'logs:article_upload' %}",
+                });
             });
         </script>
     </head>
@@ -28,7 +28,8 @@
                 <div id="div_cate">
                     <span>分类：</span>
                     <div id="div_cate_list">
-                        <input type="radio" name="category" value="不分类">不分类
+                        <input type="radio" name="category" value="">不分类
+                        <div id="div_cate_list_no_null" class="div_cate_list_no_null"></div>
                     </div>
                     <input type="button" value="+分类" onclick="add_cate()">
                     <div id="div_add_cate" style="display:none">
@@ -69,7 +70,7 @@
                             var label = document.createElement("label");
                             label.for = input.id;
                             label.innerHTML = cate_name;
-                            var div = document.getElementById("div_cate_list");
+                            var div = document.getElementById("div_cate_list_no_null");
                             div.appendChild(input);
                             div.appendChild(label);
                         })
@@ -106,6 +107,7 @@
                         success: function (error_msg) {
                             document.getElementById("tips_add_cate").innerHTML = "" + error_msg;
                             if (error_msg == "") {
+                                $("#div_cate_list_no_null").empty();
                                 get_cate_list();
                             }
                         },
