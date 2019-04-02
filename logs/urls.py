@@ -9,6 +9,7 @@ from django.conf import settings
 urlpatterns = [
     url(r'^new_article/$', views.new_article, name='new_article'),
     url(r'^article_upload/$', views.article_upload, name='article_upload'),
+    url(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
     url(r'^ajax_add_cate/$', views.ajax_add_cate, name='ajax_add_cate'),
     url(r'^ajax_get_cates/$', views.ajax_get_cates, name='ajax_get_cates'),
     url(r'^user(?P<user_id>\d+)/$', views.userhome, name='userhome'),
